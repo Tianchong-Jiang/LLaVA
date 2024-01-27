@@ -102,7 +102,7 @@ def get_perplexity(
     ).to(model.device, dtype=torch.float16)
 
     input_ids = (
-        tokenizer_image_token(prompt+answer, tokenizer, IMAGE_TOKEN_INDEX, return_tensors="pt")
+        tokenizer_image_token(f'{prompt} {answer}', tokenizer, IMAGE_TOKEN_INDEX, return_tensors="pt")
         .unsqueeze(0)
         .cuda()
     )
@@ -120,10 +120,11 @@ def get_perplexity(
         model,
         input_ids=None,
         attention_mask=None,
-        inputs_embeds=inputs_embeds,
+        inputs_embeds=inputs_embeds[:, :-1, :],
         return_dict=True
     ).logits
 
+    loss_func = torch.nn.CrossEntropyLoss()
     if which_part == "answer":
         # looking for last :, which has token 29901
         pos = (input_ids[0] == 29901).nonzero()[-1].item()
@@ -131,9 +132,13 @@ def get_perplexity(
         assert len(input_ids[0]) - 1 > pos, "Answer is empty"
         logits = logits[:, pos - len(input_ids[0]):-1, :]
 
-    loss_func = torch.nn.CrossEntropyLoss()
-    loss = loss_func(logits.view(-1, logits.size(-1)),
-                    torch.as_tensor(input_ids[0][pos + 1:], device=logits.device))
+        loss = loss_func(logits.view(-1, logits.size(-1)),
+                torch.as_tensor(input_ids[0][pos + 1:], device=logits.device))
+
+    elif which_part == "last":
+        loss = loss_func(logits[:, -1:, :].view(-1, logits.size(-1)),
+                torch.as_tensor(input_ids[0][-1:], device=logits.device))
+
     pp = torch.exp(loss).item()
     return pp
 

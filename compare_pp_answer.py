@@ -3,7 +3,6 @@ os.environ['TRANSFORMERS_CACHE'] = '/mount/'
 
 from llava.model.builder import load_pretrained_model
 from llava.mm_utils import get_model_name_from_path
-from llava.eval.run_llava import eval_model
 from get_pp import get_perplexity
 
 model_path = "liuhaotian/llava-v1.5-7b"
