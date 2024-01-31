@@ -13,8 +13,8 @@ RUN apt install -y python3.10 \
 
 RUN python3.10 -m pip install torch==2.0.1
 RUN python3.10 -m pip install torchvision==0.15.2
-RUN python3.10 -m pip install transformers==4.31.0
-RUN python3.10 -m pip install tokenizers==0.12.1
+RUN python3.10 -m pip install transformers==4.36.2
+RUN python3.10 -m pip install tokenizers==0.15.0
 RUN python3.10 -m pip install sentencepiece==0.1.99
 RUN python3.10 -m pip install shortuuid
 RUN python3.10 -m pip install accelerate==0.21.0
